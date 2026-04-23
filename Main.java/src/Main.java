@@ -5,8 +5,6 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Iniciando projeto CRUD");
         Scanner scanner = new Scanner(System.in);
-        int iddelete=0;
-        int idmodification=0;
         ArrayList<Usuario> usuarios = new ArrayList<>();
         usuarios.add(new Usuario(1, "Daniel"));
         usuarios.add(new Usuario(2, "Luiz"));
@@ -22,53 +20,20 @@ public class Main {
             opcao = scanner.nextInt();
             switch (opcao) {
                 case 1:
-                    // cadastrar
+                    cadastrar(usuarios,scanner);
                     break;
 
                 case 2:
-                    for (Usuario u : usuarios) {
-                        System.out.println(u);
-                    }
+                    listar(usuarios);
                     break;
 
                 case 3:
-                    System.out.println("Digite o id do usuário que deseja deletar:");
-                    iddelete= scanner.nextInt();
-                    boolean encontrado = false;
+                    deletar(usuarios,scanner);
+                    break;
 
-                    for (Usuario u: usuarios){
-                        if (iddelete == u.getId()){
-                            usuarios.remove(u);
-                            encontrado = true;
-                            System.out.println("Usuário removido com sucesso!");
-                            break;
-                        }
-                    }
-
-                    if (!encontrado){
-                        System.out.println("Usuário não encontrado!");
-                    }break;
 
                 case 4:
-                    System.out.println("Digite o id do usuário que deseja fazer as modificções:");
-                    idmodification= scanner.nextInt();
-                    scanner.nextLine();
-                    boolean encontradomodi=false;
-                    for (Usuario u: usuarios){
-                        if (idmodification == u.getId()){
-                            System.out.println("Digite aqui o novo nome desse usuário:");
-                            String new_name = scanner.nextLine();
-                            u.setNome(new_name);
-                            System.out.println("O novo nome desse usuário é:"+ new_name);
-                            encontradomodi = true;
-                            System.out.println("Usuário modificado com sucesso!");
-                            break;
-                        }
-
-                    }
-                    if (!encontradomodi){
-                        System.out.println("Usuário não encontrado!");
-                    }
+                    atualizar(usuarios,scanner);
 
                     break;
 
@@ -81,6 +46,76 @@ public class Main {
             }
 
         }
+
+    }
+    public  static  void listar(ArrayList<Usuario> usuarios){
+        for (Usuario u : usuarios) {
+            System.out.println(u);
+        }
+
+    }
+    public static void deletar(ArrayList<Usuario>usuarios, Scanner scanner){
+        System.out.println("Digite o id do usuário que deseja deletar:");
+        int iddelete= scanner.nextInt();
+        boolean encontrado = false;
+
+        for (Usuario u: usuarios){
+            if (iddelete == u.getId()){
+                usuarios.remove(u);
+                encontrado = true;
+                System.out.println("Usuário removido com sucesso!");
+                break;
+            }
+        }
+
+        if (!encontrado){
+            System.out.println("Usuário não encontrado!");
+        }
+
+    }
+    public static void atualizar(ArrayList<Usuario>usuarios,Scanner scanner){
+        System.out.println("Digite o id do usuário que deseja fazer as modificções:");
+        int idmodification= scanner.nextInt();
+        scanner.nextLine();
+        boolean encontrado=false;
+        for (Usuario u: usuarios){
+            if (idmodification == u.getId()){
+                System.out.println("Digite aqui o novo nome desse usuário:");
+                String new_name = scanner.nextLine();
+                u.setNome(new_name);
+                System.out.println("O novo nome desse usuário é:  "+ new_name);
+                encontrado = true;
+                System.out.println("Usuário modificado com sucesso!");
+                break;
+            }
+
+        }
+        if (!encontrado){
+            System.out.println("Usuário não encontrado!");
+        }
+    }
+    public static void cadastrar(ArrayList<Usuario>usuarios,Scanner scanner){
+        System.out.println("Digite o ID no novo usuário:");
+        int idnew= scanner.nextInt();
+        scanner.nextLine();
+
+        boolean encontrado=false;
+        for (Usuario u: usuarios){
+            if (idnew==u.getId()){
+                encontrado=true;
+                break;
+            }
+        }
+        if (encontrado){
+            System.out.println("Usuário já cadastrado!");
+        }else{
+            System.out.println("Digite um nome para esse novo usuário:");
+            String namenew= scanner.nextLine();
+
+            usuarios.add(new Usuario(idnew,namenew));
+            System.out.println("Usuário cadastrado com sucesso!");
+        }
+
 
     }
 }
