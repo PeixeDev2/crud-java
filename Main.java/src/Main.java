@@ -1,122 +1,106 @@
-import java.util.ArrayList;
+import java.sql.*;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Iniciando projeto CRUD");
-        Scanner scanner = new Scanner(System.in);
-        ArrayList<Usuario> usuarios = new ArrayList<>();
-        usuarios.add(new Usuario(1, "Daniel"));
-        usuarios.add(new Usuario(2, "Luiz"));
-        int opcao = 0;
-        while (opcao != 5) {
-            System.out.println("Digite uma opção: ");
-            System.out.println("1-Cadastrar");
-            System.out.println("2-Listar");
-            System.out.println("3-Deletar");
-            System.out.println("4-Atualizar");
-            System.out.println("5-Sair");
 
-            opcao = scanner.nextInt();
-            switch (opcao) {
-                case 1:
-                    cadastrar(usuarios,scanner);
-                    break;
+        try {
+            Connection conexao = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/crud_usuarios",
+                    "root",
+                    "Daniel,231014"
+            );
+            System.out.println("Conectado ao banco!");
 
-                case 2:
-                    listar(usuarios);
-                    break;
+            Scanner scanner = new Scanner(System.in);
+            int opcao = 0;
 
-                case 3:
-                    deletar(usuarios,scanner);
-                    break;
+            while (opcao != 5) {
+                System.out.println("Digite uma opção: ");
+                System.out.println("1-Cadastrar");
+                System.out.println("2-Listar");
+                System.out.println("3-Deletar");
+                System.out.println("4-Atualizar");
+                System.out.println("5-Sair");
 
+                opcao = scanner.nextInt();
 
-                case 4:
-                    atualizar(usuarios,scanner);
-
-                    break;
-
-                case 5:
-                    System.out.println("Saindo...");
-                    break;
-
-                default:
-                    System.out.println("Opção inválida");
+                switch (opcao) {
+                    case 1:
+                        cadastrar(conexao, scanner);
+                        break;
+                    case 2:
+                        listar(conexao);
+                        break;
+                    case 3:
+                        deletar(conexao, scanner);
+                        break;
+                    case 4:
+                        atualizar(conexao, scanner);
+                        break;
+                    case 5:
+                        System.out.println("Saindo...");
+                        break;
+                    default:
+                        System.out.println("Opção inválida");
+                }
             }
 
+        } catch (SQLException e) {
+            System.out.println("Erro ao conectar: " + e.getMessage());
         }
-
     }
-    public  static  void listar(ArrayList<Usuario> usuarios){
-        for (Usuario u : usuarios) {
-            System.out.println(u);
+
+    public static void listar(Connection conexao) throws SQLException {
+        String sql = "SELECT * FROM usuarios";
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            System.out.println(rs.getInt("id") + " - " + rs.getString("nome"));
         }
-
     }
-    public static void deletar(ArrayList<Usuario>usuarios, Scanner scanner){
+
+    public static void deletar(Connection conexao, Scanner scanner) throws SQLException {
         System.out.println("Digite o id do usuário que deseja deletar:");
-        int iddelete= scanner.nextInt();
-        boolean encontrado = false;
+        int id = scanner.nextInt();
 
-        for (Usuario u: usuarios){
-            if (iddelete == u.getId()){
-                usuarios.remove(u);
-                encontrado = true;
-                System.out.println("Usuário removido com sucesso!");
-                break;
-            }
-        }
+        String sql = "DELETE FROM usuarios WHERE id = ?";
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        stmt.setInt(1, id);
+        stmt.executeUpdate();
 
-        if (!encontrado){
-            System.out.println("Usuário não encontrado!");
-        }
-
+        System.out.println("Usuário deletado com sucesso!");
     }
-    public static void atualizar(ArrayList<Usuario>usuarios,Scanner scanner){
-        System.out.println("Digite o id do usuário que deseja fazer as modificções:");
-        int idmodification= scanner.nextInt();
-        scanner.nextLine();
-        boolean encontrado=false;
-        for (Usuario u: usuarios){
-            if (idmodification == u.getId()){
-                System.out.println("Digite aqui o novo nome desse usuário:");
-                String new_name = scanner.nextLine();
-                u.setNome(new_name);
-                System.out.println("O novo nome desse usuário é:  "+ new_name);
-                encontrado = true;
-                System.out.println("Usuário modificado com sucesso!");
-                break;
-            }
 
-        }
-        if (!encontrado){
-            System.out.println("Usuário não encontrado!");
-        }
-    }
-    public static void cadastrar(ArrayList<Usuario>usuarios,Scanner scanner){
-        System.out.println("Digite o ID no novo usuário:");
-        int idnew= scanner.nextInt();
+    public static void atualizar(Connection conexao, Scanner scanner) throws SQLException {
+        System.out.println("Digite o id do usuário que deseja atualizar:");
+        int id = scanner.nextInt();
         scanner.nextLine();
 
-        boolean encontrado=false;
-        for (Usuario u: usuarios){
-            if (idnew==u.getId()){
-                encontrado=true;
-                break;
-            }
-        }
-        if (encontrado){
-            System.out.println("Usuário já cadastrado!");
-        }else{
-            System.out.println("Digite um nome para esse novo usuário:");
-            String namenew= scanner.nextLine();
+        System.out.println("Digite o novo nome:");
+        String nome = scanner.nextLine();
 
-            usuarios.add(new Usuario(idnew,namenew));
-            System.out.println("Usuário cadastrado com sucesso!");
-        }
+        String sql = "UPDATE usuarios SET nome = ? WHERE id = ?";
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        stmt.setString(1, nome);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
 
+        System.out.println("Usuário atualizado com sucesso!");
+    }
 
+    public static void cadastrar(Connection conexao, Scanner scanner) throws SQLException {
+        System.out.println("Digite o nome do novo usuário:");
+        scanner.nextLine();
+        String nome = scanner.nextLine();
+
+        String sql = "INSERT INTO usuarios (nome) VALUES (?)";
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        stmt.setString(1, nome);
+        stmt.executeUpdate();
+
+        System.out.println("Usuário cadastrado com sucesso!");
     }
 }
-
