@@ -9,7 +9,7 @@ public class Main {
             Connection conexao = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/crud_usuarios",
                     "root",
-                    "Daniel,231014"
+                    "senha123"
             );
             System.out.println("Conectado ao banco!");
 
